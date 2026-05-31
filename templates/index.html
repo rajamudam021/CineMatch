@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch | Personalized Movie Recommender</title>
+    <meta name="description" content="Explore and discover movie recommendations curated specifically for you using machine learning technologies.">
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vanilla CSS Custom Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Top Premium Navigation -->
+    <header class="app-header">
+        <div class="logo">
+            <i class="fa-solid fa-clapperboard logo-icon"></i>
+            <span>Cine<span class="highlight">Match</span></span>
+        </div>
+        <div class="nav-links">
+            <a href="#discover" class="active">Discover</a>
+            <a href="#ratings">My Ratings</a>
+            <a href="#recommendations">For You</a>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <!-- Hero Dynamic Landing Section -->
+        <section class="hero-section" id="discover">
+            <div class="hero-content">
+                <span class="badge">Machine Learning Engine</span>
+                <h1>Discover Movies Tailored to Your Taste</h1>
+                <p>Search, rate, and get instant recommendations using content similarity indexing and hybrid collaborative filtering models.</p>
+                
+                <!-- Advanced Search Box -->
+                <div class="search-wrapper">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="movie-search" placeholder="Type a movie title (e.g. Inception, The Dark Knight, Toy Story)..." autocomplete="off">
+                        <button id="search-btn" class="btn btn-primary">
+                            <span class="btn-text">Find Matches</span>
+                            <i class="fa-solid fa-magnifying-glass btn-icon-mobile"></i>
+                        </button>
+                    </div>
+                    <!-- Live Search Dropdown Suggestions -->
+                    <div id="autocomplete-suggestions" class="autocomplete-list hidden"></div>
+                </div>
+
+                <!-- Premium Filter Control Dock -->
+                <div class="filters-dock">
+                    <div class="filter-group">
+                        <label for="filter-genre"><i class="fa-solid fa-tags text-primary"></i> Target Genre</label>
+                        <select id="filter-genre">
+                            <option value="">All Genres</option>
+                            <option value="Action">Action</option>
+                            <option value="Adventure">Adventure</option>
+                            <option value="Animation">Animation</option>
+                            <option value="Comedy">Comedy</option>
+                            <option value="Crime">Crime</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Family">Family</option>
+                            <option value="Fantasy">Fantasy</option>
+                            <option value="Horror">Horror</option>
+                            <option value="Mystery">Mystery</option>
+                            <option value="Romance">Romance</option>
+                            <option value="ScienceFiction">Science Fiction</option>
+                            <option value="Thriller">Thriller</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-rating"><i class="fa-solid fa-star text-star"></i> Min Rating: <span id="rating-val">0.0</span></label>
+                        <input type="range" id="filter-rating" min="0" max="9" step="0.5" value="0">
+                    </div>
+                    <div class="filter-group toggle-group">
+                        <label for="filter-hidden-gems">
+                            <i class="fa-solid fa-gem text-accent"></i> Unique / Hidden Gems Only
+                        </label>
+                        <input type="checkbox" id="filter-hidden-gems" class="toggle-checkbox">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Dynamic Recommendation Dashboard -->
+        <div class="dashboard-grid">
+            <!-- Left Panel: Movie Content Recommendation & Directory -->
+            <div class="main-panel">
+                <!-- Search Result Showcase -->
+                <div id="search-result-showcase" class="showcase-card hidden">
+                    <div class="showcase-header">
+                        <h2>Currently Selected</h2>
+                        <button id="clear-selected-btn" class="btn btn-icon" title="Clear selection"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="showcase-content">
+                        <!-- Filled Dynamically -->
+                    </div>
+                </div>
+
+                <!-- Similar Movies Recommendations -->
+                <div id="similar-section" class="similar-movies-container hidden">
+                    <div class="section-title">
+                        <i class="fa-solid fa-wand-magic-sparkles text-accent"></i>
+                        <h3>Because you liked that: Similar Movies</h3>
+                    </div>
+                    <div id="similar-movies-grid" class="movies-grid">
+                        <!-- Cards added dynamically -->
+                    </div>
+                </div>
+
+                <!-- AI Recommendations (Collaborative Hybrid Filtering) -->
+                <div id="recommendations" class="similar-movies-container" style="margin-bottom: 3rem;">
+                    <div class="section-title">
+                        <i class="fa-solid fa-brain text-accent"></i>
+                        <h3>For You: AI Personalized Recommendations</h3>
+                    </div>
+                    <div id="collaborative-suggestions-container" class="movies-grid">
+                        <div class="empty-state" style="grid-column: 1 / -1; padding: 3rem 1rem;">
+                            <i class="fa-solid fa-bolt text-accent" style="font-size: 2.5rem; filter: drop-shadow(0 0 10px rgba(217, 70, 239, 0.4));"></i>
+                            <h4 style="margin-top: 1rem; font-weight: 600;">Personalized Suggestions Await</h4>
+                            <p style="max-width: 450px; margin: 0.5rem auto 0; font-size: 0.9rem; color: var(--text-muted);">
+                                Add 3 or more high ratings (4-5 stars) in the explore catalog to calculate your hybrid collaborative filtering output!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explore Movie Catalog -->
+                <div id="explore-section" class="explore-catalog">
+                    <div class="section-title">
+                        <i class="fa-solid fa-compass text-primary"></i>
+                        <h3>Explore Movie Catalog</h3>
+                    </div>
+                    <div id="catalog-grid" class="movies-grid">
+                        <!-- Cards added dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar Panel: User Ratings log -->
+            <aside class="sidebar-panel">
+                <!-- Personal Taste Dashboard -->
+                <div class="glass-sidebar-card" id="ratings">
+                    <div class="sidebar-header">
+                        <i class="fa-solid fa-star text-star"></i>
+                        <h3>Your Rating Station</h3>
+                    </div>
+                    <p class="sidebar-subtitle">Rate movies in the catalog to teach the collaborative model your tastes!</p>
+                    
+                    <div id="rated-movies-list" class="rated-movies-list">
+                        <div class="empty-state">
+                            <i class="fa-regular fa-star"></i>
+                            <p>No ratings registered yet. Click on any movie's star rating to begin!</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Interactive Detailed Movie Modal -->
+    <div id="movie-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-grid">
+                <div class="modal-poster-wrapper">
+                    <img id="modal-poster" src="" alt="Movie Poster">
+                </div>
+                <div class="modal-info">
+                    <div class="modal-meta-top">
+                        <span id="modal-year" class="badge"></span>
+                        <span id="modal-rating" class="badge bg-gold"><i class="fa-solid fa-star"></i> 8.5</span>
+                    </div>
+                    <h2 id="modal-title"></h2>
+                    <p id="modal-director" class="modal-director"></p>
+                    <div id="modal-genres" class="genres-wrapper"></div>
+                    <p id="modal-overview" class="modal-desc"></p>
+                    <div class="modal-cast-section">
+                        <h4>Starring Cast</h4>
+                        <p id="modal-cast"></p>
+                    </div>
+                    <div class="modal-interactive-row">
+                        <div class="interactive-rating-block">
+                            <span>Your Rating:</span>
+                            <div class="star-rating-interactive" data-movie="">
+                                <i class="fa-regular fa-star" data-value="1"></i>
+                                <i class="fa-regular fa-star" data-value="2"></i>
+                                <i class="fa-regular fa-star" data-value="3"></i>
+                                <i class="fa-regular fa-star" data-value="4"></i>
+                                <i class="fa-regular fa-star" data-value="5"></i>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:0.75rem;">
+                            <button id="modal-play-btn" class="btn btn-primary"><i class="fa-solid fa-play"></i> Watch Trailer</button>
+                            <button id="modal-recommend-btn" class="btn btn-accent">Show Similar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cinematic Widescreen Trailer Player Overlay -->
+            <div id="modal-video-overlay" class="modal-video-overlay hidden">
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <button id="close-video-btn" class="close-video-btn" style="margin-bottom:0;"><i class="fa-solid fa-arrow-left"></i> Back to Details</button>
+                    <span id="modal-video-status-text" style="font-size: 0.88rem; color: var(--text-muted); font-weight: 500; text-align: center;"></span>
+                    <a id="modal-video-external-btn" href="" target="_blank" class="btn-youtube"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a>
+                </div>
+                <iframe id="modal-video-iframe" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Toast Alert notifications -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Floating Mobile Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="#discover" class="mobile-nav-item active">
+            <i class="fa-solid fa-compass"></i>
+            <span>Discover</span>
+        </a>
+        <a href="#ratings" class="mobile-nav-item">
+            <i class="fa-solid fa-star"></i>
+            <span>Ratings</span>
+        </a>
+        <a href="#recommendations" class="mobile-nav-item">
+            <i class="fa-solid fa-brain"></i>
+            <span>For You</span>
+        </a>
+    </nav>
+
+    <footer class="app-footer">
+        <p>&copy; 2026 CineMatch. Designed with modern AI technologies.</p>
+    </footer>
+
+    <!-- App JavaScript Logic -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
